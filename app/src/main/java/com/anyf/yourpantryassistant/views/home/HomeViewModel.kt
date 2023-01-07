@@ -1,4 +1,4 @@
-package com.anyf.yourpantryassistant.ui.home
+package com.anyf.yourpantryassistant.views.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
