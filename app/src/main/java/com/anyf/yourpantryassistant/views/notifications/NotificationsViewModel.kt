@@ -1,4 +1,4 @@
-package com.anyf.yourpantryassistant.ui.notifications
+package com.anyf.yourpantryassistant.views.notifications
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
