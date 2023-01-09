@@ -54,6 +54,13 @@
             android:theme="@style/Theme.YourPantryAssitant">
         </activity>
 
+        <activity
+            android:name=".CameraXSourceDemoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.YourPantryAssitant">
+        </activity>
+
+
 
     </application>
 

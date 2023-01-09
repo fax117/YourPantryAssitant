@@ -1,5 +1,6 @@
 package com.anyf.yourpantryassistant
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.camera ->
-                        Toast.makeText(this@MainActivity, "Opens video camera", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this,  CameraXSourceDemoActivity::class.java))
                     R.id.gallery ->
                         Toast.makeText(this@MainActivity, "Opens gallery", Toast.LENGTH_SHORT).show()
                     R.id.photo ->

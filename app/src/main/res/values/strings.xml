@@ -8,6 +8,7 @@
     <string name="gallery">Gallery</string>
     <string name="photo">Photo</string>
     <string name="menu_item_settings" translatable="false">Settings</string>
+    <string name="custom_object_detection" translatable="false">Custom Object Detector</string>
 
     <!-- Settings related strings. -->
     <string name="pref_screen" translatable="false">ps</string>

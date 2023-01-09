@@ -76,6 +76,11 @@ dependencies {
     // Image labeling custom
     implementation 'com.google.mlkit:image-labeling-custom:17.0.1'
 
+    // Selfie segmentation
+    implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta4'
+
+    implementation 'com.google.mlkit:camera:16.0.0-beta3'
+
     //------------------------------------------------
 
     implementation 'com.google.code.gson:gson:2.8.6'
@@ -91,10 +96,12 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'com.google.mlkit:object-detection:17.0.0'
-    implementation 'androidx.camera:camera-core:1.2.0'
+    //implementation 'androidx.camera:camera-core:1.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+
+
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-livedata:2.3.1"
