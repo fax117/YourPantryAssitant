@@ -1,7 +1,11 @@
 package com.anyf.yourpantryassistant
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -12,6 +16,9 @@ import com.anyf.yourpantryassistant.databinding.ActivityMainBinding
 import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.camera ->
-                        startActivity(Intent(this,  CameraXSourceDemoActivity::class.java))
+                            startActivity(Intent(this,  CameraXSourceDemoActivity::class.java))
                     R.id.gallery ->
                         Toast.makeText(this@MainActivity, "Opens gallery", Toast.LENGTH_SHORT).show()
                     R.id.photo ->
@@ -41,6 +48,11 @@ class MainActivity : AppCompatActivity() {
             })
             popupMenu.show()
         }
+
+        if (!allRuntimePermissionsGranted()) {
+            getRuntimePermissions()
+        }
+
 
         val navView: BottomNavigationView = binding.navView
 
@@ -54,5 +66,57 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    private fun allRuntimePermissionsGranted(): Boolean {
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
+            permission?.let {
+                if (!isPermissionGranted(this, it)) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    private fun getRuntimePermissions() {
+        val permissionsToRequest = ArrayList<String>()
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
+            permission?.let {
+                if (!isPermissionGranted(this, it)) {
+                    permissionsToRequest.add(permission)
+                }
+            }
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray(),
+                PERMISSION_REQUESTS
+            )
+        }
+    }
+
+    private fun isPermissionGranted(context: Context, permission: String): Boolean {
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.i(TAG, "Permission granted: $permission")
+            return true
+        }
+        Log.i(TAG, "Permission NOT granted: $permission")
+        return false
+    }
+
+    companion object {
+        private const val TAG = "Live Camera Object"
+        private const val PERMISSION_REQUESTS = 1
+
+        private val REQUIRED_RUNTIME_PERMISSIONS =
+            arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
     }
 }
