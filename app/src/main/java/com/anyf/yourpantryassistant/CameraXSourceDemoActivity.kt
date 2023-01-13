@@ -23,6 +23,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.util.Size
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.Toast
@@ -37,6 +38,7 @@ import com.google.mlkit.vision.camera.DetectionTaskCallback
 import com.anyf.yourpantryassistant.GraphicOverlay
 import com.anyf.yourpantryassistant.InferenceInfoGraphic
 import com.anyf.yourpantryassistant.R
+import com.anyf.yourpantryassistant.models.Groceries
 import com.anyf.yourpantryassistant.objectdetector.ObjectGraphic
 import com.anyf.yourpantryassistant.preference.PreferenceUtils
 import com.anyf.yourpantryassistant.preference.SettingsActivity
@@ -59,6 +61,8 @@ class CameraXSourceDemoActivity : AppCompatActivity(), CompoundButton.OnCheckedC
   private var cameraXSource: CameraXSource? = null
   private var customObjectDetectorOptions: CustomObjectDetectorOptions? = null
   private var targetResolution: Size? = null
+  private val groceries = Groceries()
+  private var flag = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -79,6 +83,10 @@ class CameraXSourceDemoActivity : AppCompatActivity(), CompoundButton.OnCheckedC
       val intent = Intent(applicationContext, SettingsActivity::class.java)
       intent.putExtra(SettingsActivity.EXTRA_LAUNCH_SOURCE, LaunchSource.CAMERAXSOURCE_DEMO)
       startActivity(intent)
+    }
+    val readyButton = findViewById<Button>(R.id.ready_button)
+    readyButton.setOnClickListener {
+      Log.v("DETECTED OBJECTS", groceries.food.size.toString())
     }
   }
 
@@ -122,6 +130,7 @@ class CameraXSourceDemoActivity : AppCompatActivity(), CompoundButton.OnCheckedC
   }
 
   private fun createThenStartCameraXSource() {
+
     if (cameraXSource != null) {
       cameraXSource!!.close()
     }
@@ -134,7 +143,7 @@ class CameraXSourceDemoActivity : AppCompatActivity(), CompoundButton.OnCheckedC
     var detectionTaskCallback: DetectionTaskCallback<List<DetectedObject>> =
       DetectionTaskCallback<List<DetectedObject>> { detectionTask ->
         detectionTask
-          .addOnSuccessListener { results -> onDetectionTaskSuccess(results) }
+          .addOnSuccessListener { results -> onDetectionTaskSuccess(results, groceries) }
           .addOnFailureListener { e -> onDetectionTaskFailure(e) }
       }
     val builder: CameraSourceConfig.Builder =
@@ -150,7 +159,14 @@ class CameraXSourceDemoActivity : AppCompatActivity(), CompoundButton.OnCheckedC
     cameraXSource!!.start()
   }
 
-  private fun onDetectionTaskSuccess(results: List<DetectedObject>) {
+  private fun onDetectionTaskSuccess(results: List<DetectedObject>, groceries: Groceries) {
+    if(results.size != flag){
+      for (`object` in results) {
+        groceries.food.add(`object`)
+      }
+      flag = results.size
+      Log.v("DETECTED FLAG", flag.toString())
+    }
     graphicOverlay!!.clear()
     if (needUpdateGraphicOverlayImageSourceInfo) {
       val size: Size = cameraXSource!!.getPreviewSize()!!
