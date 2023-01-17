@@ -38,8 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
     LIVE_PREVIEW(R.string.pref_screen_title_live_preview, LivePreviewPreferenceFragment.class),
     STILL_IMAGE(R.string.pref_screen_title_still_image, StillImagePreferenceFragment.class),
     CAMERAX_LIVE_PREVIEW(
-        R.string.pref_screen_title_camerax_live_preview,
-        CameraXLivePreviewPreferenceFragment.class),
+            R.string.pref_screen_title_camerax_live_preview,
+            CameraXLivePreviewPreferenceFragment.class),
     CAMERAXSOURCE_DEMO(
         R.string.pref_screen_title_cameraxsource_demo, CameraXSourceDemoPreferenceFragment.class);
 

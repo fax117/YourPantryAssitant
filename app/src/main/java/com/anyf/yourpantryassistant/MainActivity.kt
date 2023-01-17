@@ -1,10 +1,15 @@
 package com.anyf.yourpantryassistant
 
 import android.Manifest
+import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +28,7 @@ import java.util.ArrayList
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +44,11 @@ class MainActivity : AppCompatActivity() {
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
                 when(item.itemId) {
                     R.id.camera ->
-                            startActivity(Intent(this,  CameraXSourceDemoActivity::class.java))
+                        startActivity(Intent(this,  CameraXSourceDemoActivity::class.java))
                     R.id.gallery ->
-                        Toast.makeText(this@MainActivity, "Opens gallery", Toast.LENGTH_SHORT).show()
+                        startChooseImageIntentForResult()
                     R.id.photo ->
-                        Toast.makeText(this@MainActivity, "Opens photo camera", Toast.LENGTH_SHORT).show()
+                        startCameraIntentForResult()
                 }
                 true
             })
@@ -68,6 +74,32 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    private fun startChooseImageIntentForResult() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(
+            Intent.createChooser(intent, "Select Picture"),
+            REQUEST_CHOOSE_IMAGE
+        )
+    }
+
+    private fun startCameraIntentForResult() { // Clean up last time's image
+        imageUri = null
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            val values = ContentValues()
+            values.put(MediaStore.Images.Media.TITLE, "New Picture")
+            values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera")
+            imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            startActivityForResult(
+                takePictureIntent,
+                REQUEST_IMAGE_CAPTURE
+            )
+        }
+    }
+
     private fun allRuntimePermissionsGranted(): Boolean {
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
             permission?.let {
@@ -78,6 +110,31 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
+
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val intent = Intent(this,  StillImageActivity::class.java)
+            intent.data = imageUri
+            startActivity(intent)
+        } else if (requestCode == REQUEST_CHOOSE_IMAGE && resultCode == Activity.RESULT_OK) {
+            // In this case, imageUri is returned by the chooser, save it.
+            imageUri = data!!.data
+            Log.d("IMAGE", imageUri.toString())
+            val intent = Intent(this,  StillImageActivity::class.java)
+            intent.data = imageUri
+            startActivity(intent)
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+
+
 
     private fun getRuntimePermissions() {
         val permissionsToRequest = ArrayList<String>()
@@ -111,6 +168,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "Live Camera Object"
         private const val PERMISSION_REQUESTS = 1
+        private const val REQUEST_IMAGE_CAPTURE = 1001
+        private const val REQUEST_CHOOSE_IMAGE = 1002
 
         private val REQUIRED_RUNTIME_PERMISSIONS =
             arrayOf(
